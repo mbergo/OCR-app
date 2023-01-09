@@ -73,5 +73,39 @@ namespace OcrApp
             _camera.StopPreview();
             _camera.Release();
         }
+
+        // Send recognized text to API at example.com
+            string url = "http://example.com/api";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            string postData = "text=" + recognizedText;
+            byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
+            request.ContentLength = dataBytes.Length;
+
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(dataBytes, 0, dataBytes.Length);
+            }
+
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        using (StreamReader reader = new StreamReader(responseStream))
+                        {
+                            string responseText = reader.ReadToEnd();
+                            // Do something with responseText
+                        }
+                    }
+            catch (WebException ex)
+            {
+            // Handle error
+            }
+                }
+            }
     }
 }
